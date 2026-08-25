@@ -1,0 +1,67 @@
+# config_classification.yaml
+
+data:
+    feature_folder: "saved_features"
+    sel_states:  ["tubeleak", "ventleak", "ventlow"]   # pooled into the same normal/fault classes
+    sel_feature: "logmel"        # spectral_summary | bandpower | mfcc | logmel | logmel_patch
+    noises:      ["work", "hydr"] # lab hydr_low work_low
+    microphones: ["1l", "1m"]
+
+    # take-based split: no clip is shared between train and test
+    takes_train: ["1", "2"]
+    takes_test:  ["3"]
+
+    # time-axis average pooling applied right after loading (before reshaping):
+    #   frame_pool = N  -> average every N consecutive frames
+    #   frame_pool = 1 / null -> off
+    frame_pool: 8
+    frame_pool_hop: 4            # stride in frames; null -> = frame_pool (non-overlapping)
+
+model:
+    type: "dnn"                     # dnn | cnn1d | cnn2d
+    n_classes: 2                    # output layer always has 2 neurons
+
+    # --- DNN: stack of Linear layers -------------------------------------
+    #   operates on per-frame feature vectors (dim = D of the feature)
+    dnn:
+        hidden_layers: [32,32]     # one entry per hidden layer (neurons)
+        dropout: 0.1
+
+    # --- 1D-CNN: Conv1d stack (+ optional Linear head) -------------------
+    #   input = (D channels, W time frames); pairs with (N, D, T) features
+    cnn1d:
+        window: 48                  # time frames per sample; null -> whole clip
+        hop: 24                     # window stride in frames
+        conv_channels: [16,16]      # one entry per conv layer (out channels)
+        kernel_size: 3
+        pool_size: 2
+        fc_layers: [16]             # Linear layers before the 2-way output ([] = none)
+        dropout: 0.2
+
+    # --- 2D-CNN: Conv2d stack (+ optional Linear head) ------------------
+    #   pairs with logmel_patch -> (1, n_mels, patch) images.
+    #   with plain 'logmel' (3D) it windows the spectrogram using window/hop.
+    cnn2d:
+        window: 24                  # only used for 3D 'logmel' input
+        hop: 12
+        conv_channels: [16, 16]
+        kernel_size: 3
+        pool_size: 2
+        fc_layers: [16]
+        dropout: 0.1
+
+training:
+    epochs: 60
+    batch_size: 64
+    learning_rate: 0.0005
+    weight_decay: 0.0
+    val_split: 0.15                 # fraction of TRAIN clips held out for validation
+    standardize: true               # z-score using train statistics only
+    class_weight: false             # weight CE loss by inverse class frequency
+    device: "cuda"                  # auto-falls back to cpu if cuda unavailable, cuda 
+    seed: 42
+
+output:
+    results_folder: "Results"
+    save_plots: true
+    save_model: true

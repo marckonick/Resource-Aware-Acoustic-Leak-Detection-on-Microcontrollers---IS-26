@@ -1,0 +1,65 @@
+# config_testing.yaml
+
+data:
+    feature_folder: "saved_features"
+    sel_states:  ["tubeleak", "ventleak", "ventlow"]   # pooled into the same normal/fault classes
+    sel_feature: "logmel"       # spectral_summary | bandpower | mfcc | logmel | logmel_patch
+    noises:      ["work", "hydr"]  # lab hydr_low work_low hydr
+    
+    microphones: ["1l", "1m"]
+    takes_test:  ["3"]
+
+
+    # must match what the model was trained with, if it affects feature length
+    frame_pool: 8
+    frame_pool_hop: 4
+
+model:
+    type: "dnn"                     # dnn | cnn1d | cnn2d  (must match the weights)
+    n_classes: 2
+    device: "cuda"                  # auto-falls back to cpu
+
+    # --- architecture: must match the trained model exactly ---------------
+    dnn:
+        hidden_layers: [32,32]
+        dropout: 0.1
+    cnn1d:
+        window: 48
+        hop: 24
+        conv_channels: [8, 16]
+        kernel_size: 3
+        pool_size: 2
+        fc_layers: [32]
+        dropout: 0.2
+    cnn2d:
+        window: 24
+        hop: 12
+        conv_channels: [16,16]
+        kernel_size: 3
+        pool_size: 2
+        fc_layers: [16]
+        dropout: 0.1
+        
+        
+
+    # weights + standardizer. null -> auto path from the run tag:
+    #   Results/model_<states>_<feature>_<type>.pt
+    #   Results/scaler_<states>_<feature>_<type>.npz
+    model_path:  null
+    standardize: true
+    scaler_path: null
+
+ewma:
+    enabled: true
+    alpha: 0.1                      # s[t] = alpha*p[t] + (1-alpha)*s[t-1]
+    threshold: 0.5                  # decision threshold on the (smoothed) leak prob
+
+output:
+    results_folder: "Results"
+    plot_state: "ventlow"          # per-signal raw-vs-EWMA plot for this state  "tubeleak", "ventleak", "ventlow"
+    plot_ncols: 4
+    save_plots: true
+    
+    
+    
+    

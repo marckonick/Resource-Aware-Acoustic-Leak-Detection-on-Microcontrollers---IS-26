@@ -1,0 +1,70 @@
+# config_feat_extraction.yaml
+
+data_and_features:
+
+    # ---- I/O ----------------------------------------------------------------
+    base_folder:  ""              # prepended to the dataset paths in get_raw_state_data
+    save_folder:  "saved_features"
+
+    # ---- what to extract ----------------------------------------------------
+    sel_states: ["tubeleak", "ventleak", "ventlow"]
+    selected_feature: "logmel"   # spectral_summary | bandpower | mfcc | logmel
+    #   aliases: 'spectral', 'bandpower_ratio', 'logmel_patch'
+
+    # dataset sweep
+    noises:      ["work", "hydr"] #  lab, work_low, hydr_low
+    takes:       ["1", "2", "3"]
+    microphones: ["1l", "1m"]
+
+    # ---- sampling -----------------------------------------------------------
+    Fs: 48000          # original sample rate of the .wav files
+    downsample: 3      # 48000 / 3 = 16000 Hz target (embedded rate)
+
+    # summarize per-frame features across time before saving.
+    #   null      -> save per-frame features (N, D, T)   [default, matches old code]
+    #   mean_std  -> (N, 2D)
+    #   stats     -> (N, 5D)   mean/std/min/max/median
+    summarize: null
+
+    # ---- per-feature parameters --------------------------------------------
+    # Only the block matching `selected_feature` is passed to the extractor.
+    # All hop/n_fft values are in samples at the *target* (16 kHz) rate.
+    feature_params:
+
+        spectral_summary:
+            n_fft: 1024
+            hop_length: 512       # 10 ms @ 16 kHz  -> T ~= 3001 for a 30 s clip
+
+        bandpower:
+            n_fft: 1024
+            hop_length: 512
+            n_bands: 8
+            fmin: 50.0
+            fmax: null            # null -> Nyquist (8000 Hz)
+            band_scale: "log"     # "log" or "linear"
+            log_power: true
+            ref_band: null        # set an int index -> band *ratios* w.r.t. that band
+
+        mfcc:
+            n_fft: 1024
+            hop_length: 512
+            n_mels: 40
+            n_mfcc: 13
+            fmin: 0.0
+            fmax: null
+            deltas: false         # true -> also stack delta + delta-delta (3 x n_mfcc)
+
+        logmel:
+            n_fft: 1024
+            hop_length: 512       # 32 ms/frame @ 16 kHz
+            n_mels: 40
+            fmin: 0.0
+            fmax: null
+            power: 2.0
+            top_db: 80.0
+            patch_frames: 24    # null -> full (N, n_mels, T); e.g. 24 -> ~800 ms patches
+            patch_hop: 12       # null -> non-overlapping patches
+
+model_optimization:
+  device: "cuda" # 
+  batch_size: 128
