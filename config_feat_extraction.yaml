@@ -63,7 +63,7 @@ data_and_features:
             power: 2.0
             top_db: 80.0
             patch_frames: 24    # null -> full (N, n_mels, T); e.g. 24 -> ~800 ms patches
-            patch_hop: 12       # null -> non-overlapping patches
+            patch_hop: 4       # null -> non-overlapping patches
 
 model_optimization:
   device: "cuda" # 
