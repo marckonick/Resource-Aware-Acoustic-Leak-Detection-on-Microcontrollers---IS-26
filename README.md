@@ -9,19 +9,19 @@ nature of leak emissions to accumulate evidence across frames rather than classi
 
 The dataset can be downloaded from the following repository - https://zenodo.org/records/7551606
 
-All experiments use the IDMT compressed-air leakage dataset \cite{Grollmisch2019}. 
+All experiments use the IDMT compressed-air leakage dataset 
 Recordings were made on a Festo Didactic pneumatic rig in a laboratory. Leakage was generated
 by a choke vent whose aperture was set with a knurled screw, advanced from
-zero to nine turns across $16$ discrete states (full rotations up to three
-turns, half rotations thereafter), while each state was recorded for $30$\,s. Three
-leakage types are present: a \emph{vent leak} at the nominal $6$\,bar, a
-quieter \emph{vent low} at $5$\,bar, and a \emph{tube leak} from damaged
+zero to nine turns across 16 discrete states (full rotations up to three
+turns, half rotations thereafter), while each state was recorded for 30 s. Three
+leakage types are present: a vent leak at the nominal 6 bar, a
+quieter vent low at 5 bar, and a tube leak from damaged
 tubing. To emulate industrial conditions, each type was recorded under
 laboratory noise and under workshop and hydraulic-press noise replayed
-through loudspeakers at two levels, giving $15$ configurations across three
-independent sessions. Four Earthworks M30 microphones ($3$\,Hz--$30$\,kHz)
-recorded in parallel, positioned at $20$\,cm/$90^{\circ}$, $2$\,m/$90^{\circ}$
-and $20$\,cm/$30^{\circ}$ from the source, with a fourth at an omnidirectional
+through loudspeakers at two levels, giving 15 configurations across three
+independent sessions. Four Earthworks M30 microphones 3 - 30 kHz
+recorded in parallel, positioned at 20cm 90 deg, 2m 90 deg
+and 20 cm 30 deg from the source, with a fourth at an omnidirectional
 reference position in the room.
 
 ## Files Description
